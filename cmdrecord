@@ -3,7 +3,7 @@
 if [ -x $(dirname "$0")/cmdcheck ]; then
   . $(dirname "$0")/cmdcheck
 else
-  . "$(which cmdcheck)"
+  . "$(/usr/bin/which cmdcheck)"
 fi
 me=$(basename "$0")
 

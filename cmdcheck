@@ -367,10 +367,14 @@ with_env_vars(){
   env -i PATH= "${env_defs[@]}" "$@"
 }
 
+expand_command(){
+  which "$command" || error 1 "The command \`$command' is not in PATH"
+}
+
 record(){
   # NOTE Should we check that std{in,err,out}_file are paths
   # for the current directory (no / in there)?
-  local full_command=$(which "$command")
+  local full_command=$(expand_command "$command")
 
   tee "$stdin_file" |
     with_env_vars '' "${env_vars[@]}" -- \
@@ -611,7 +615,7 @@ copy_file(){
 }
 
 check_action_mydir(){
-  local full_command=$(which "$command")
+  local full_command=$(expand_command "$command")
   stdout_file=stdout
   stderr_file=stderr
   setup
