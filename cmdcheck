@@ -534,6 +534,9 @@ usage(){
 Usage: $me [<option>*]  <testname>.t*
 
   option ::= --batch
+           | --log=<FILE>
+           | --log-level=<NUMBER>
+           | --print-directory
 
 EOF
   error 1 $@""
@@ -710,8 +713,11 @@ check_action_refdir(){
 check_action(){
   while [ "$#" -gt 0 ]; do
     case "$1" in
-      --batch) shift; batch_mode=1;;
-      *) break
+      (--batch) batch_mode=1; shift;;
+      (--log=*) log_file="${1#--log=}"; shift;;
+      (--log-level=*) log_level="${1#--log-level=}"; shift;;
+      (--print-directory) print_directory=1; shift;;
+      (*) break
     esac
   done
   [ "$#" -gt 0 ] || usage The test name was expected
