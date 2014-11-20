@@ -86,20 +86,22 @@ log_w(){
   (( ! print_directory )) || info "$@"
 }
 
-if tty -s; then
-  CR='\r'
-  color(){
-    col="$1"
-    shift
-    printf "\e[${col}m$@\e[m"
-  }
-else
+CR='\r'
+color(){
+  col="$1"
+  shift
+  printf "\e[${col}m$@\e[m"
+}
+
+no_colors(){
   CR='\n'
   color(){
     shift
     echo -n "$@"
   }
-fi
+}
+
+tty -s || no_colors
 
 red(){    color '1;31' "$@"; }
 green(){  color '1;32' "$@"; }
@@ -536,6 +538,7 @@ Usage: $me [<option>*]  <testname>.t*
   option ::= --batch
            | --log=<FILE>
            | --log-level=<NUMBER>
+           | --color=no
            | --print-directory
 
 EOF
@@ -716,6 +719,7 @@ check_action(){
       (--batch) batch_mode=1; shift;;
       (--log=*) log_file="${1#--log=}"; shift;;
       (--log-level=*) log_level="${1#--log-level=}"; shift;;
+      (--color=no) no_colors; shift;;
       (--print-directory) print_directory=1; shift;;
       (*) break
     esac
