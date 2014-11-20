@@ -37,8 +37,7 @@ Usage: $me <testname>.t <option>* -- <cmd> <cmd-arg>*
                | pass
 
 EOF
-  echo error: "$@" >>"$log_file"
-  exit 1
+  error 1 "$@"
 }
 
 parse_env_option(){

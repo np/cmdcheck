@@ -155,11 +155,16 @@ show_vars(){
   done
 }
 
+# Adapted to write to $log_file instead of /dev/stderr
+# error() @ https://gist.github.com/np/3736727#file-error-sh {{{
+# Takes an exit code and a message, prints the message and then exits
 error(){
-  echo >>"$log_file"
-  info "$@"
-  exit 1
+  local code="$1"
+  shift
+  echo "error: $@" >>"$log_file"
+  exit "$code"
 }
+# }}}
 
 internal_error(){
   info "$@"
@@ -250,7 +255,7 @@ ensure_empty_dir(){
       mkdir "$dir"
     fi
   elif [ -e "$dir" ]; then
-    error "$(printf %q "$dir")" already exists and is not a directory
+    error 1 "$(printf %q "$dir")" already exists and is not a directory
   else
     mkdir "$dir"
   fi
@@ -384,9 +389,9 @@ record(){
 assert_non_dirs(){
   for assert_non_dirs_file; do
     local file="$assert_non_dirs_file"
-    [ ! -d "$file" ] || error "\`$file' is a directory, list each files of the directory instead"
+    [ ! -d "$file" ] || error 1 "\`$file' is a directory, list each files of the directory instead"
     # Excluding all non-regular files also excludes /dev/null
-    # [ -f "$file" ] || error "\`$file' should be a regular file"
+    # [ -f "$file" ] || error 1 "\`$file' should be a regular file"
   done
 }
 
@@ -527,8 +532,7 @@ Usage: $me [<option>*]  <testname>.t*
   option ::= --batch
 
 EOF
-  echo error: "$@" >>"$log_file"
-  exit 1
+  error 1 $@""
 }
 
 check_valid_var(){
@@ -597,7 +601,7 @@ copy_file(){
       if (( ! batch_mode )) && asking "\`$dst' already exists, overwrite?"; then
         cp -a "$src" "$dst"
       else
-        error "\`$dst' already exists"
+        error 1 "\`$dst' already exists"
       fi
     fi
   else
@@ -648,9 +652,9 @@ copy_source_or_product(){
   else
     case "$raw_file" in
       *://*)
-        error "URLs are not supported yet in sources";;
+        error 1 "URLs are not supported yet in sources";;
       *)
-        error "The source file \`$raw_file' does not exist";;
+        error 1 "The source file \`$raw_file' does not exist";;
     esac
   fi
 }
