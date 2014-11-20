@@ -7,15 +7,6 @@ else
 fi
 me=$(basename "$0")
 
-assert_non_dirs(){
-  for assert_non_dirs_file; do
-    local file="$assert_non_dirs_file"
-    [ ! -d "$file" ] || error "\`$file' is a directory, list each files of the directory instead"
-    # Excluding all non-regular files also excludes /dev/null
-    # [ -f "$file" ] || error "\`$file' should be a regular file"
-  done
-}
-
 usage(){
   cat_info <<EOF
 Usage: $me <testname>.t <option>* -- <cmd> <cmd-arg>*
